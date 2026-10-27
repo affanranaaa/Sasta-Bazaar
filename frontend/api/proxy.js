@@ -1,7 +1,4 @@
-// Disable Vercel's automatic body parsing so POST/PUT bodies are forwarded intact.
-export const config = {
-  api: { bodyParser: false },
-};
+export const config = { api: { bodyParser: false } };
 
 const BACKEND = (
   process.env.BACKEND_URL || "https://sasta-bazaar-six.vercel.app"
@@ -9,11 +6,23 @@ const BACKEND = (
 
 export default async function handler(req, res) {
   try {
+    const incoming = new URL(req.url, "http://localhost");
+    let path = incoming.searchParams.get("path") || "";
+    incoming.searchParams.delete("path");
+
+    // All your Django routes end with a slash
+    if (path && !path.endsWith("/")) path += "/";
+
+    const qs = incoming.searchParams.toString();
+    const target = `${BACKEND}/api/${path}${qs ? "?" + qs : ""}`;
+
     const headers = { ...req.headers };
-    delete headers.host;
-    delete headers.connection;
-    delete headers["content-length"];
-    delete headers["accept-encoding"]; // ask the backend for an uncompressed response
+    for (const h of [
+      "host", "connection", "content-length", "accept-encoding",
+      "x-forwarded-host", "x-forwarded-for", "x-forwarded-proto",
+      "x-vercel-id", "x-vercel-deployment-url", "x-vercel-forwarded-for",
+      "x-real-ip",
+    ]) delete headers[h];
 
     let body;
     if (!["GET", "HEAD"].includes(req.method)) {
@@ -22,7 +31,7 @@ export default async function handler(req, res) {
       body = Buffer.concat(chunks);
     }
 
-    const response = await fetch(BACKEND + req.url, {
+    const response = await fetch(target, {
       method: req.method,
       headers,
       body,
@@ -31,23 +40,13 @@ export default async function handler(req, res) {
 
     res.status(response.status);
 
-    const skip = [
-      "content-encoding",
-      "transfer-encoding",
-      "content-length",
-      "set-cookie",
-      "connection",
-    ];
-
+    const skip = ["content-encoding", "transfer-encoding", "content-length", "set-cookie", "connection"];
     response.headers.forEach((value, key) => {
       if (skip.includes(key)) return;
-
-      // Keep redirects (e.g. Django's APPEND_SLASH) on the frontend domain.
       if (key === "location") {
         res.setHeader(key, value.replace(BACKEND, ""));
         return;
       }
-
       res.setHeader(key, value);
     });
 
