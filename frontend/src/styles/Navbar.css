@@ -1,0 +1,22 @@
+/* Navbar logo */
+.navbar-logo {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Navbar search positioning */
+.navbar-search-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 1rem;
+}
+
+/* Responsive Navbar */
+@media (max-width: 991.98px) {
+  .navbar-search-wrapper {
+    max-width: 100%;
+    margin: 0.75rem 0;
+  }
+}
