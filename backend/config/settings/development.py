@@ -19,3 +19,6 @@ DATABASES = {
 # Stripe TEST keys for local development
 STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY", default="")
 STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET", default="")
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
