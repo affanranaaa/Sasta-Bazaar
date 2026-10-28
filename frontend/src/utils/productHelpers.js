@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
 export function getAvailableQuantity(product) {
   if (product.available_quantity != null) {
@@ -25,8 +25,15 @@ export function getProductImageUrl(product, image = product.images?.[0]) {
     return null;
   }
 
+  // Absolute URLs (Supabase in staging) are used untouched.
+  if (/^https?:\/\//i.test(imageValue)) {
+    return imageValue;
+  }
+
+  // Relative paths (e.g. /media/... in local dev) resolve against the API base,
+  // or against the current origin when no base is set.
   try {
-    return new URL(imageValue, `${API_BASE_URL}/`).href;
+    return new URL(imageValue, API_BASE_URL || window.location.origin).href;
   } catch {
     return null;
   }
