@@ -43,7 +43,17 @@ export function AuthProvider({ children }) {
     [fetchProfile],
   );
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    // Ask Django to flush the session (applied coupon, guest cart, etc.).
+    // The endpoint needs no authentication, so it works even when the
+    // access token has expired. Failures are ignored so the user is
+    // always logged out locally.
+    try {
+      await api.post("/api/auth/logout/");
+    } catch {
+      // ignore
+    }
+
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     setUser(null);

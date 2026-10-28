@@ -5,6 +5,7 @@ from .views import (
     RegisterView,
     ProfileView,
     CartMergingTokenObtainPairView,
+    LogoutView,
 )
 
 urlpatterns = [
@@ -19,5 +20,6 @@ urlpatterns = [
         TokenRefreshView.as_view(),
         name="api-token-refresh",
     ),
+    path("logout/", LogoutView.as_view(), name="api-logout"),
     path("profile/", ProfileView.as_view(), name="api-profile"),
 ]

@@ -64,6 +64,23 @@ class CartMergingTokenObtainPairView(TokenObtainPairView):
         )
 
 
+class LogoutView(APIView):
+    """
+    POST /api/auth/logout/ - wipe the Django session.
+
+    Clears the applied coupon and any leftover guest data so the next
+    visitor in this browser starts clean. Authentication is disabled so
+    logout still works when the access token has already expired.
+    """
+
+    authentication_classes = []
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        request.session.flush()
+        return Response({"detail": "Logged out."}, status=status.HTTP_200_OK)
+
+
 class RegisterView(generics.CreateAPIView):
     """POST /api/auth/register/ - public signup."""
 
