@@ -361,7 +361,7 @@ export default function Products() {
                       type="number"
                       className="form-control"
                       placeholder="0.00"
-                      min="0"
+                      min="1"
                       step="0.01"
                       value={form.price}
                       onChange={handleFormChange}

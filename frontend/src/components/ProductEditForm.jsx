@@ -61,7 +61,7 @@ export default function ProductEditForm({
                 name="price"
                 type="number"
                 className="form-control"
-                min="0"
+                min="1"
                 step="0.01"
                 value={editForm.price}
                 onChange={onChange}
